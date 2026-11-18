@@ -258,10 +258,10 @@
   function $(id) { return document.getElementById(id); }
   var ui = {
     titulo: $("titulo"), mensaje: $("mensaje"), super: $("super"),
-    actualizado: $("actualizado"), btn: $("btn-actualizar"),
+    actualizado: $("actualizado"), btn: $("btn-actualizar"), btnTexto: $("btn-texto"),
     demo: $("demo"), aviso: $("aviso"),
     global: $("global"), globalTexto: $("global-texto"), globalBarra: $("global-barra"), globalSub: $("global-sub"),
-    lista: $("lista"), contacto: $("contacto")
+    indice: $("indice"), lista: $("lista"), contacto: $("contacto")
   };
 
   var cargando = false;
@@ -300,30 +300,25 @@
     return b;
   }
 
+  // Fila de la lista: nombre y estado arriba; detalle y cantidad abajo; barra solo si ya llegó algo.
   function renderItem(it) {
     var li = el("li", "item item--" + it.estado);
-    var fila = el("div", "item-fila");
-    fila.appendChild(el("span", "item-nombre", it.item));
-    var tag = el("span", "etiqueta etiqueta--" + it.estado);
-    if (it.estado === "cubierto") {
-      var chk = el("span", null, "✓ ");
-      chk.setAttribute("aria-hidden", "true");
-      tag.appendChild(chk);
-    }
-    tag.appendChild(document.createTextNode(TEXTO_ESTADO[it.estado]));
-    fila.appendChild(tag);
-    li.appendChild(fila);
-
+    li.appendChild(el("span", "item-nombre", it.item));
+    li.appendChild(el("span", "estado estado--" + it.estado, TEXTO_ESTADO[it.estado]));
     if (it.detalle) li.appendChild(el("p", "item-detalle", it.detalle));
 
     if (it.meta != null && it.meta > 0 && it.recibido != null) {
-      var pct = Math.max(0, Math.min(100, Math.round((it.recibido / it.meta) * 100)));
-      var p = el("div", "progreso");
-      p.appendChild(barra(pct, "Avance de " + it.item));
-      p.appendChild(el("span", "progreso-texto", fmtNum(it.recibido) + " de " + fmtNum(it.meta)));
-      li.appendChild(p);
+      li.appendChild(el("p", "item-cantidad", fmtNum(it.recibido) + " de " + fmtNum(it.meta)));
+      if (it.recibido > 0 && it.estado !== "cubierto") {
+        var pct = Math.max(0, Math.min(100, Math.round((it.recibido / it.meta) * 100)));
+        li.appendChild(barra(pct, "Avance de " + it.item));
+      }
     }
     return li;
+  }
+
+  function idCategoria(nombre) {
+    return "cat-" + (norm(nombre).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "otros");
   }
 
   function procesar(itemsTxt, cfgTxt) {
@@ -365,7 +360,8 @@
     }
 
     var g = progresoGlobal(visibles);
-    if (g.total) {
+    // "Llevamos 0 %" no informa nada: el avance global aparece cuando ya llegó algo.
+    if (g.total && (g.pct || g.cubiertos)) {
       ui.global.hidden = false;
       vaciar(ui.globalBarra);
       if (g.pct != null) {
@@ -374,9 +370,7 @@
       } else {
         ui.globalTexto.textContent = "Así vamos";
       }
-      ui.globalSub.textContent = g.cubiertos === 1
-        ? "1 de " + g.total + " productos ya está cubierto."
-        : g.cubiertos + " de " + g.total + " productos ya están cubiertos.";
+      ui.globalSub.textContent = g.cubiertos + " de " + g.total + (g.total === 1 ? " cubierto" : " cubiertos");
     } else {
       ui.global.hidden = true;
     }
@@ -385,9 +379,15 @@
     if (g.cubiertos === g.total) {
       frag.appendChild(el("p", "vacio", "Por ahora no hay ítems pendientes. ¡Gracias!"));
     }
-    agrupar(visibles).forEach(function (cat) {
+    var cats = agrupar(visibles);
+    vaciar(ui.indice);
+    ui.indice.hidden = cats.length < 2;
+    cats.forEach(function (cat) {
+      var id = idCategoria(cat.nombre);
       var sec = el("section", "categoria");
-      var h = el("h2", null, cat.nombre);
+      sec.id = id;
+      var h = el("h2");
+      h.appendChild(el("span", null, cat.nombre));
       h.appendChild(el("span", "categoria-cuenta",
         cat.pendientes === 0 ? "Todo cubierto" : cat.pendientes === 1 ? "1 por cubrir" : cat.pendientes + " por cubrir"));
       sec.appendChild(h);
@@ -395,6 +395,11 @@
       cat.items.forEach(function (it) { ul.appendChild(renderItem(it)); });
       sec.appendChild(ul);
       frag.appendChild(sec);
+
+      var a = el("a", null, cat.nombre);
+      a.href = "#" + id;
+      a.appendChild(el("span", null, cat.pendientes ? String(cat.pendientes) : "✓"));
+      ui.indice.appendChild(a);
     });
     vaciar(ui.lista);
     ui.lista.appendChild(frag);
@@ -484,7 +489,7 @@
     cargando = true;
     ultimoIntento = Date.now();
     ui.btn.disabled = true;
-    ui.btn.textContent = "Actualizando…";
+    ui.btnTexto.textContent = "Actualizando…";
 
     var pCfg = CONFIG_URL
       ? traer(CONFIG_URL).catch(function (e) { console.warn(e); return null; })
@@ -525,7 +530,7 @@
       .then(function () {
         cargando = false;
         ui.btn.disabled = false;
-        ui.btn.textContent = "Actualizar";
+        ui.btnTexto.textContent = "Actualizar";
       });
   }
 

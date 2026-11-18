@@ -4,8 +4,8 @@
  * conexión, usa la última copia guardada. Solo guarda archivos de este mismo
  * sitio; el CSV de Google lo maneja app.js con localStorage.
  */
-var CACHE = "colecta-v1";
-var BASE = ["./", "index.html", "style.css", "app.js", "config.js"];
+var CACHE = "colecta-v2";
+var BASE = ["./", "index.html", "style.css", "app.js", "config.js", "logo.png"];
 
 self.addEventListener("install", function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(BASE); }).then(function () { return self.skipWaiting(); }));

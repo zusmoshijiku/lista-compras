@@ -4,22 +4,25 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" content="#f6f4ef" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#121416" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#121212" media="(prefers-color-scheme: dark)">
   <meta name="description" content="Lista actualizada de los insumos que necesita la colecta.">
   <title>Lista de la colecta</title>
-  <link rel="icon" href="data:,">
+  <link rel="icon" href="logo.png">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="contenedor">
     <header class="cabecera">
-      <h1 id="titulo">Lista de la colecta</h1>
+      <div class="marca">
+        <img class="logo" src="logo.png" alt="" width="48" height="34">
+        <h1 id="titulo">Lista de la colecta</h1>
+      </div>
       <p id="mensaje" class="mensaje" hidden></p>
       <p id="super" class="super" hidden></p>
       <div class="acciones">
         <p id="actualizado" class="actualizado" hidden></p>
-        <button id="btn-actualizar" class="btn" type="button">Actualizar</button>
+        <button id="btn-actualizar" class="btn" type="button"><span id="btn-texto">Actualizar</span></button>
       </div>
     </header>
 
@@ -27,19 +30,21 @@
     <p id="aviso" class="aviso" role="status" hidden></p>
 
     <section id="global" class="global" aria-labelledby="global-texto" hidden>
-      <p id="global-texto" class="global-texto"></p>
+      <div class="global-fila">
+        <p id="global-texto" class="global-texto"></p>
+        <p id="global-sub" class="global-sub"></p>
+      </div>
       <div id="global-barra"></div>
-      <p id="global-sub" class="global-sub"></p>
     </section>
+
+    <nav id="indice" class="indice" aria-label="Categorías" hidden></nav>
 
     <main id="lista" class="lista" aria-busy="true">
       <p class="cargando">Cargando la lista…</p>
-      <div class="esqueleto" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
     </main>
 
     <footer class="pie">
       <p id="contacto" hidden></p>
-      <p>¡Gracias por tu aporte!</p>
     </footer>
   </div>
 
