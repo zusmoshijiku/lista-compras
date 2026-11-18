@@ -18,16 +18,23 @@ Google Sheets (el equipo edita)  →  CSV publicado  →  página en GitHub Page
 | `config.js` | **Lo único que hay que editar**: URLs de la planilla, título y cada cuánto se actualiza. |
 | `sw.js` | Permite que la página abra sin señal (después de la primera visita). |
 | `datos-ejemplo/` | Lista de ejemplo que se usa mientras `config.js` no tiene URL. |
-| `plantilla/plantilla-sheet.xlsx` | Plantilla de la planilla, para subir a Google Drive. |
-| `generar_qr.py` | Genera el QR en PNG y SVG. |
+| `plantilla/plantilla-sheet.xlsx` | Plantilla de la planilla, para escribir la lista a mano. |
+| `plantilla/plantilla-sheet-maestro.xlsx` | Plantilla que calcula la lista sola desde el Excel maestro de operaciones (sección 1B). |
+| `generar_qr.py`, `logo-qr.png` | Genera el QR en PNG y SVG, con `logo-qr.png` al centro. |
 | `apps-script-opcional.gs` | Opcional: guarda la hora de la última edición. |
+| `apps-script-maestro-opcional.gs` | Opcional: lo mismo, pero en el maestro (sección 1B). |
 | `pruebas/pruebas.js` | Pruebas del lector de CSV y de la lógica (`node pruebas/pruebas.js`). |
 
 ---
 
 ## 1. Crear la planilla desde la plantilla
 
-1. Entra a [Google Drive](https://drive.google.com) → **Nuevo → Subir archivo** → elige `plantilla/plantilla-sheet.xlsx`.
+Hay dos plantillas; elige una:
+
+- **`plantilla-sheet.xlsx`**: el equipo escribe la lista a mano en `Items`. Pasos de esta sección.
+- **`plantilla-sheet-maestro.xlsx`**: la lista se calcula sola desde el Excel maestro de operaciones (metas y cajas recibidas). Sigue los pasos de esta sección con ese archivo y después la **sección 1B**.
+
+1. Entra a [Google Drive](https://drive.google.com) → **Nuevo → Subir archivo** → elige la plantilla.
 2. Abre el archivo subido con **Hojas de cálculo de Google**.
 3. **Archivo → Guardar como Hojas de cálculo de Google.** Esto crea una copia en formato Google (sin este paso no se puede publicar). Trabaja siempre en esa copia; puedes borrar el `.xlsx`.
 4. **Archivo → Configuración → Zona horaria**: elige *(GMT-03:00) Santiago* (o la que corresponda). Guarda.
@@ -55,6 +62,51 @@ Google Sheets (el equipo edita)  →  CSV publicado  →  página en GitHub Page
 Si `meta` y `recibido` tienen números, el producto muestra una barra de avance, y arriba aparece "Llevamos X % de la meta" (promedio del avance de cada producto).
 
 La página no se cae con errores de tipeo: `estado` acepta mayúsculas y espacios de más (" cubierto " = "Cubierto"), y un estado desconocido se muestra en gris como "Se necesita".
+
+## 1B. Conectar con el Excel maestro (solo `plantilla-sheet-maestro.xlsx`)
+
+Es lo mismo que hacía la planilla del año pasado: la hoja "Stock" traía el maestro con `IMPORTRANGE` y la hoja "Público" calculaba la prioridad. Aquí la pestaña `Items` queda lista para la página, sin escribir nada a mano.
+
+1. El maestro tiene que estar en Google Sheets. Si es un `.xlsx`, súbelo a Drive y usa **Archivo → Guardar como Hojas de cálculo de Google**. Copia su URL.
+2. En la planilla de la página, pestaña **Maestro**: borra todo (lo que trae es solo un ejemplo) y escribe en `A1`:
+   ```
+   =IMPORTRANGE("URL del maestro"; "Meta (con JUNA)!A1:I250")
+   ```
+   - Usa `Meta (sin JUNA)` si esa es la hoja que corresponde.
+   - Si tu planilla usa coma para separar argumentos, cambia `;` por `,`.
+3. Haz clic en `A1` y luego en **Permitir acceso** (solo la primera vez).
+4. Revisa la pestaña **Items**: se llena sola, con las secciones del maestro como categorías.
+
+Cómo se arma cada columna de `Items`:
+
+| columna | sale de |
+|---|---|
+| `categoria` | la fila de encabezado de cada sección del maestro: "Insumos Comida" → **Comida** |
+| `item` | columna A del maestro (insumo) |
+| `detalle` | columna B (unidad), como "Medida: Kilo"; se omite si la unidad es "Unidad" |
+| `meta` | columna D (Meta a Alcanzar) |
+| `recibido` | columna I (Total) |
+| `estado` | avance = recibido ÷ meta: bajo 50 % **Falta mucho**, bajo 100 % **Falta poco**, desde 100 % **Cubierto** (mismos umbrales que la hoja "Público" del año pasado) |
+| `visible` | `SI` si la meta es mayor que 0; los productos con meta 0 no se muestran |
+
+Para que esto funcione, el maestro tiene que mantener su forma: columnas A a I en ese orden y cada sección partiendo con una fila de encabezado que diga "Meta a Alcanzar" en la columna D. Las celdas con error del maestro (`#REF!`, `#DIV/0!`) no rompen la página: sin meta, el producto se oculta; sin total, se cuenta como 0 recibido.
+
+**Cambiar algo a mano:** no escribas en `Items`, porque cada celda es una fórmula y esa fila dejaría de actualizarse. Usa la pestaña **Ajustes**: elige el producto por su nombre y escribe solo lo que quieras cambiar:
+
+- `estado`: por ejemplo "Cubierto", para dejar de pedirlo aunque el maestro diga que falta;
+- `visible`: "NO", para ocultarlo;
+- `supermercado`: para mostrarlo solo en el QR de un local;
+- `detalle`: por ejemplo "bolsa 1 kg".
+
+Lo que dejes vacío se sigue calculando desde el maestro. Como se busca por nombre, sigue funcionando aunque se agreguen filas al maestro.
+
+**Hora de actualización (opcional):** pega `apps-script-maestro-opcional.gs` en el maestro (ver sección 7) y escribe en `Config!B2` de la planilla de la página:
+
+```
+=IMPORTRANGE("URL del maestro"; "Web!A1")
+```
+
+> Los cambios del maestro no llegan al instante: `IMPORTRANGE` se refresca cada cierto tiempo y, además, Google demora unos minutos en actualizar el CSV publicado.
 
 ## 2. Publicar cada pestaña como CSV
 
@@ -112,22 +164,25 @@ window.APP_CONFIG = {
 
 **El QR se imprime una sola vez: decide la URL definitiva antes.** Si después cambias el nombre del repositorio o tu usuario de GitHub, la URL cambia y los papelitos dejan de funcionar.
 
-1. Instala el paquete del QR (una sola vez):
+1. Instala los paquetes del QR (una sola vez):
    ```powershell
-   pip install segno
+   pip install segno pillow
    ```
 2. Genera el QR con la URL de GitHub Pages:
    ```powershell
    python generar_qr.py "https://<tu-usuario>.github.io/lista-compras/"
    ```
-   Crea `qr-colecta.png` y `qr-colecta.svg` (corrección de errores nivel H, borde blanco de 4 módulos, negro sobre blanco).
+   Crea `qr-colecta.png` y `qr-colecta.svg`, con corrección de errores nivel H, borde blanco de 4 módulos y negro sobre blanco. Al centro pone `logo-qr.png`.
+   - **El logo:** se recorta a su contenido y va sobre un recuadro blanco con su misma forma. Para cambiarlo, reemplaza `logo-qr.png` (PNG con fondo transparente es lo ideal) o usa `--logo otra-imagen.png`.
+   - **Tamaño del logo:** por defecto el recuadro tapa el 12 % de la superficie del QR. Con `--logo-area 15` (el máximo) se ve más grande; con `--logo-area 8`, más chico. Mientras más grande, menos margen queda si el papel se arruga o se mancha.
+   - **Sin logo:** usa `--sin-logo`.
 3. Para el papelito, usa el **SVG** (no pierde calidad al cambiar de tamaño) o el PNG.
 4. Al imprimir:
    - tamaño mínimo **3 × 3 cm**; mejor 4 cm;
    - negro sobre fondo blanco, sin poner el QR sobre fotos o colores;
    - deja el margen blanco alrededor (no lo recortes);
    - agrega una línea de texto bajo el QR, por ejemplo: *"Escanea para ver lo que más falta hoy"*.
-5. **Antes de imprimir en cantidad**, imprime uno y escanéalo con al menos dos celulares distintos (uno Android y un iPhone, si se puede).
+5. **Antes de imprimir en cantidad**, imprime uno y escanéalo con al menos dos celulares distintos (uno Android y un iPhone, si se puede), también desde un poco más lejos y con poca luz. Si a alguno le cuesta, genera el QR con un `--logo-area` menor.
 
 ### QR distinto por supermercado (opcional)
 
@@ -169,10 +224,16 @@ Si cambias los CSV de `datos-ejemplo/`, regenera la copia que se usa al abrir co
 python datos-ejemplo/generar_ejemplo_js.py
 ```
 
-Si cambias las filas de ejemplo o el formato de la plantilla, regenérala (requiere `openpyxl`):
+Si cambias las filas de ejemplo o el formato de las plantillas, regenéralas (requiere `openpyxl`):
 
 ```powershell
 python plantilla/generar_plantilla.py
+```
+
+Para revisar la plantilla del maestro con los datos reales antes de subirla, puedes crear una copia local con los valores de una hoja del maestro pegados en `Maestro`. Guárdala fuera del repositorio, porque el repositorio es público:
+
+```powershell
+python plantilla/generar_plantilla.py --maestro-xlsx "$HOME\Downloads\Maestro Operaciones Verano 2027.xlsx" --hoja "Meta (con JUNA)" -o "$HOME\Downloads\prueba-maestro.xlsx"
 ```
 
 ## 7. Opcional: hora de la última edición
@@ -186,9 +247,17 @@ Con este script, cada vez que alguien edita la planilla se guarda la fecha y hor
 
 No hace falta darle permisos ni configurar activadores: `onEdit` corre solo al editar. Asegúrate de que la zona horaria de la planilla esté bien (paso 1.4).
 
+**Con la plantilla del maestro**, este script no sirve: la lista cambia cuando se edita el maestro, no la planilla de la página. En su lugar:
+
+1. En el **maestro**, crea una pestaña vacía llamada `Web`.
+2. En el maestro: **Extensiones → Apps Script**, pega `apps-script-maestro-opcional.gs` y guarda. Si el maestro ya tenía una función `onEdit`, copia sus líneas dentro de la existente en vez de pegar otra.
+3. En la planilla de la página, escribe en `Config!B2`: `=IMPORTRANGE("URL del maestro"; "Web!A1")`.
+
 ---
 
 ## Cómo actualizar durante el día (para coordinadores)
+
+**Si usan la plantilla del maestro:** actualicen el maestro como siempre (cajas y metas); la página se pone al día sola. Para excepciones, usen la pestaña **Ajustes**, nunca `Items`. Lo de abajo aplica a la planilla manual.
 
 - **Cambia el `estado`** con la lista desplegable: *Falta mucho* → *Falta poco* → *Cubierto*.
 - **Suma lo recibido** en `recibido` (solo el número). La barra se mueve sola.
