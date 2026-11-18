@@ -13,8 +13,8 @@
  * https://docs.google.com/spreadsheets/d/e/2PACX-.../pub?gid=0&single=true&output=csv
  */
 window.APP_CONFIG = {
-  CSV_ITEMS_URL: "",
-  CSV_CONFIG_URL: "",
+  CSV_ITEMS_URL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSYjZ2DjnzOM6Zn_8aI-BO822BRl0gPzhwbrr0whm8DxsxQ0_agC0LjkW3Pslz7vVnaN0dDpq3FcUP6/pub?gid=192444426&single=true&output=csv",
+  CSV_CONFIG_URL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSYjZ2DjnzOM6Zn_8aI-BO822BRl0gPzhwbrr0whm8DxsxQ0_agC0LjkW3Pslz7vVnaN0dDpq3FcUP6/pub?gid=739723525&single=true&output=csv",
   REFRESH_SECONDS: 120,
-  NOMBRE_CAMPAÑA: "Colecta solidaria"
+  NOMBRE_CAMPAÑA: "Colecta de Insumos TDI"
 };
