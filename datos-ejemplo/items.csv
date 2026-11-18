@@ -1,0 +1,21 @@
+orden,categoria,item,detalle,estado,meta,recibido,supermercado,visible
+1,Abarrotes,Arroz grado 1,bolsa 1 kg,Falta mucho,40,12,,SI
+2,Abarrotes,Fideos,"spaghetti, corbatitas o espirales; paquete 400 g",Falta poco,50,38,,SI
+3,Abarrotes,Aceite vegetal,botella 1 L,Falta mucho,30,6,,SI
+4,Abarrotes,Leche en polvo,"bolsa 800 g, entera o semidescremada",Falta mucho,25,3,,SI
+5,Abarrotes,Legumbres,"lentejas, porotos o garbanzos (bolsa 1 kg)",Cubierto,30,31,,SI
+6,Abarrotes,Atún en lata,lata 170 g,Falta poco,40,29,,SI
+7,Abarrotes,Azúcar,bolsa 1 kg, cubierto ,20,22,,SI
+8,Abarrotes,Té o café,,Falta poco,,,,SI
+9,Abarrotes,Galletas de agua,"paquete ""familiar"" o tipo soda",Falta mucho,30,7,,si
+1,Aseo,Detergente en polvo,bolsa 1 kg,Falta mucho,20,4,,SI
+2,Aseo,Lavaloza,botella 500 ml,Cubierto,15,15,,SI
+3,Aseo,Cloro,botella 1 L,FALTA POCO,15,11,,SI
+4,Aseo,Esponjas,pack de 3,Cubierto,,,,SI
+5,Aseo,Jabón para ropa,barra o líquido,Falta poco,20,14,jumbo-sur,SI
+1,Higiene,Pañales,"talla G y XG
+(por favor, no talla RN)",Falta mucho,30,5,,SI
+2,Higiene,Papel higiénico,"pack de 4 rollos, doble hoja",Falta poco,40,30,,SI
+3,Higiene,Pasta de dientes,tubo 90 g,Falta mucho,25,8,lider-centro,SI
+4,Higiene,Toallas higiénicas,paquete normal o nocturna,Por revisar,,,,SI
+5,Higiene,Shampoo,botella 400 ml,Falta poco,,,,NO

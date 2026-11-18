@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#f6f4ef" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#121416" media="(prefers-color-scheme: dark)">
+  <meta name="description" content="Lista actualizada de los insumos que necesita la colecta.">
+  <title>Lista de la colecta</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="contenedor">
+    <header class="cabecera">
+      <h1 id="titulo">Lista de la colecta</h1>
+      <p id="mensaje" class="mensaje" hidden></p>
+      <p id="super" class="super" hidden></p>
+      <div class="acciones">
+        <p id="actualizado" class="actualizado" hidden></p>
+        <button id="btn-actualizar" class="btn" type="button">Actualizar</button>
+      </div>
+    </header>
+
+    <p id="demo" class="aviso aviso--info" hidden>Modo de prueba: estás viendo datos de ejemplo.</p>
+    <p id="aviso" class="aviso" role="status" hidden></p>
+
+    <section id="global" class="global" aria-labelledby="global-texto" hidden>
+      <p id="global-texto" class="global-texto"></p>
+      <div id="global-barra"></div>
+      <p id="global-sub" class="global-sub"></p>
+    </section>
+
+    <main id="lista" class="lista" aria-busy="true">
+      <p class="cargando">Cargando la lista…</p>
+      <div class="esqueleto" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+    </main>
+
+    <footer class="pie">
+      <p id="contacto" hidden></p>
+      <p>¡Gracias por tu aporte!</p>
+    </footer>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
