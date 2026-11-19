@@ -220,18 +220,12 @@ h2 {
   transform: translateY(-.12em) rotate(45deg);
 }
 
-.item-detalle,
-.item-cantidad {
+.item-detalle {
+  grid-column: 1 / -1;
   margin: 0;
   color: var(--suave);
   font-size: 1.125rem;
-}
-.item-detalle { grid-column: 1; white-space: pre-line; }
-.item-cantidad {
-  grid-column: 2;
-  justify-self: end;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
+  white-space: pre-line;
 }
 
 .item .barra { grid-column: 1 / -1; height: 4px; margin-top: var(--e2); }

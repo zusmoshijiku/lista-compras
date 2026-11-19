@@ -282,11 +282,6 @@
     nodo.hidden = !texto;
   }
 
-  function fmtNum(n) {
-    try { return n.toLocaleString("es-CL", { maximumFractionDigits: 1 }); }
-    catch (e) { return String(n); }
-  }
-
   function barra(pct, nombre) {
     var b = el("div", "barra");
     b.setAttribute("role", "progressbar");
@@ -300,19 +295,17 @@
     return b;
   }
 
-  // Fila de la lista: nombre y estado arriba; detalle y cantidad abajo; barra solo si ya llegó algo.
+  // Fila de la lista: nombre y estado arriba; detalle abajo; barra solo si ya llegó algo.
+  // A propósito no se muestran cantidades (ni la meta ni cuánto falta): solo la proporción.
   function renderItem(it) {
     var li = el("li", "item item--" + it.estado);
     li.appendChild(el("span", "item-nombre", it.item));
     li.appendChild(el("span", "estado estado--" + it.estado, TEXTO_ESTADO[it.estado]));
     if (it.detalle) li.appendChild(el("p", "item-detalle", it.detalle));
 
-    if (it.meta != null && it.meta > 0 && it.recibido != null) {
-      li.appendChild(el("p", "item-cantidad", fmtNum(it.recibido) + " de " + fmtNum(it.meta)));
-      if (it.recibido > 0 && it.estado !== "cubierto") {
-        var pct = Math.max(0, Math.min(100, Math.round((it.recibido / it.meta) * 100)));
-        li.appendChild(barra(pct, "Avance de " + it.item));
-      }
+    if (it.meta != null && it.meta > 0 && it.recibido > 0 && it.estado !== "cubierto") {
+      var pct = Math.max(0, Math.min(100, Math.round((it.recibido / it.meta) * 100)));
+      li.appendChild(barra(pct, "Avance de " + it.item));
     }
     return li;
   }

@@ -59,7 +59,7 @@ Hay dos plantillas; elige una:
 | `supermercado` | vacío = se muestra en todos lados; con un código, solo en el QR de ese supermercado |
 | `visible` | `SI` / `NO`; con `NO` no se muestra |
 
-Si `meta` y `recibido` tienen números, el producto muestra una barra de avance, y arriba aparece "Llevamos X % de la meta" (promedio del avance de cada producto).
+Si `meta` y `recibido` tienen números y ya llegó algo, el producto muestra una barra de avance, y arriba aparece "Llevamos X % de la meta" (promedio del avance de cada producto). La página nunca muestra las cantidades (ni la meta ni cuánto falta), solo la proporción. Ojo: los números sí están en el CSV publicado, que cualquiera con la URL puede abrir.
 
 La página no se cae con errores de tipeo: `estado` acepta mayúsculas y espacios de más (" cubierto " = "Cubierto"), y un estado desconocido se muestra en gris como "Se necesita".
 
